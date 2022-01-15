@@ -2,15 +2,6 @@ library(tidyverse)
 library(ggrepel)
 library(patchwork)
 
-
-lower_ci <- function(mean, se, n, conf_level = 0.95){
-  mean - qt(1 - ((1 - conf_level) / 2), n - 1) * se
-}
-
-upper_ci <- function(mean, se, n, conf_level = 0.95){
-  mean + qt(1 - ((1 - conf_level) / 2), n - 1) * se
-}
-
 ipress <- readRDS("extra/ipress.rds")
 antig <- readRDS("20220115/antig.rds") %>%
   left_join(
@@ -25,12 +16,8 @@ antig <- readRDS("20220115/antig.rds") %>%
     max = max(precio, na.rm = TRUE),
     sd = sd(precio, na.rm = TRUE),
     med = median(precio, na.rm = TRUE),
-    ci = list(
-      mean_cl_normal(precio) %>%
-        rename(mean=y, lwr=ymin, upr=ymax)
-    )
+    mean = mean(precio, na.rm = TRUE)
   ) %>%
-  unnest(ci) %>%
   ungroup() %>%
   mutate(
     dpto_lbl = paste0(DEPARTAMENTO, " (N: ", n, ")"),
@@ -50,12 +37,8 @@ pcr <- readRDS("20220115/pcr.rds") %>%
     max = max(precio, na.rm = TRUE),
     sd = sd(precio, na.rm = TRUE),
     med = median(precio, na.rm = TRUE),
-    ci = list(
-      mean_cl_normal(precio) %>%
-        rename(mean=y, lwr=ymin, upr=ymax)
-    )
+    mean = mean(precio, na.rm = TRUE)
   ) %>%
-  unnest(ci) %>%
   ungroup() %>%
   mutate(
     dpto_lbl = paste0(DEPARTAMENTO, " (N: ", n, ")"),
@@ -91,7 +74,7 @@ pcr_plot <- ggplot(
     x = "",
     y = ""
   )
-pcr_plot
+#pcr_plot
 
 antig_plot <- ggplot(
   antig %>%
@@ -123,7 +106,7 @@ antig_plot <- ggplot(
     x = "",
     y = ""
   )
-antig_plot
+#antig_plot
 
 comb_plot <- (pcr_plot + antig_plot) +
   plot_annotation(
@@ -138,7 +121,7 @@ comb_plot <- (pcr_plot + antig_plot) +
     plot.caption = element_text(size = 14, family = "Inconsolata")
   )
 
-comb_plot
+#comb_plot
 
 ggsave(
   comb_plot,
