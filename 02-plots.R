@@ -3,7 +3,10 @@ library(ggrepel)
 library(patchwork)
 
 ipress <- readRDS("extra/ipress.rds")
+
 antig <- readRDS("20220115/antig.rds") %>%
+  filter(!is.na(precio) &
+           precio > 0.02) %>% # eliminar valores cercanos a cero
   left_join(
     ipress,
     by = c("codigo_ipress" = "COD_IPRESS")
@@ -25,6 +28,8 @@ antig <- readRDS("20220115/antig.rds") %>%
   )
 
 pcr <- readRDS("20220115/pcr.rds") %>%
+  filter(!is.na(precio) &
+           precio > 0.02) %>% # eliminar valores cercanos a cero
   left_join(
     ipress,
     by = c("codigo_ipress" = "COD_IPRESS")
@@ -129,3 +134,4 @@ ggsave(
   width = 18,
   height = 10
 )
+
